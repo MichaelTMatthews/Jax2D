@@ -36,7 +36,7 @@ Finally, [thrusters](./entities#thruster) are connected to a single shape, and t
     Jax2D uses two primary ways to index shapes, due to how the `sim_state` is structured into two arrays, `circles` and `polygons`. These two ways are:
 
     - **Local Indices**: Here, the index is in the range `[0, len(array))`, and directly indexes the array.
-    - **Global Indices**: This is the most commonly-used way to index objects, and the index falls in the range `[0, num_circles + num_polygons)`, representing an index into the concatenated array `polygons + circles`. In other words, for polygons, the normalised indices are the same as the array indices, whereas for a circle, we have `normalised_index = array_index + static_sim_params.num_polygons`. **This is the expected input for the `add_{thruster,revolute_joint,fixed_joint}_to_scene` functions.**
+    - **Global Indices**: This is the most commonly-used way to index objects, and the index falls in the range `[0, num_circles + num_polygons)`, representing an index into the concatenated array `polygons + circles`. In other words, for polygons, the global indices are the same as the array indices, whereas for a circle, we have `global_index = local_index + static_sim_params.num_polygons`. **This is the expected input for the `add_{thruster,revolute_joint,fixed_joint}_to_scene` functions.**
 
 ### Masking
 Due to how Jax2D allows the simulation of many diverse scenes in parallel, each step effectively performs the same computation (namely, $n^2$ collisions) and masks out all of the inactive collisions. 

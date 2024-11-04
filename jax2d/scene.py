@@ -22,7 +22,7 @@ def add_thruster_to_scene(
 
     Args:
         sim_state (SimState):
-        object_index (int): The normalised object index, i.e., in the range [0, num_objects), where polygons are first, then circles.
+        object_index (int): The global object index, i.e., in the range [0, num_objects), where polygons are first, then circles.
         relative_position (jnp.ndarray): Position of the thruster relative to the center of mass of the object.
         rotation (float): The rotation of the thruster, note that it is recommended to have the thruster always point in the direction of the center of mass of the object.
         power (float, optional): How strong the thruster is. Defaults to 1.0.
@@ -73,8 +73,8 @@ def add_revolute_joint_to_scene(
     Args:
         sim_state (SimState):
         static_sim_params (StaticSimParams):
-        a_index (int): Normalised object index in range [0, num_shapes)
-        b_index (int): Normalised object index in range [0, num_shapes)
+        a_index (int): Global object index in range [0, num_shapes)
+        b_index (int): Global object index in range [0, num_shapes)
         a_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `a_index`.
         b_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `b_index`.
         motor_on (bool, optional): If this is true, the joint has a motor that can be activated by actions, applying a torque to these two objects. Defaults to False.
@@ -131,8 +131,8 @@ def add_fixed_joint_to_scene(
     Args:
         sim_state (SimState):
         static_sim_params (StaticSimParams):
-        a_index (int): Normalised object index in range [0, num_shapes)
-        b_index (int): Normalised object index in range [0, num_shapes)
+        a_index (int): Global object index in range [0, num_shapes)
+        b_index (int): Global object index in range [0, num_shapes)
         a_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `a_index`.
         b_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `b_index`.
 
@@ -193,7 +193,7 @@ def add_circle_to_scene(
         fixated (bool, optional): If true, the shape has infinite mass, meaning that it will not move and acts as a fixed shape. Defaults to False.
 
     Returns:
-        tuple[SimState, tuple[int, int]]: (new_sim_state, (circle_index, normalised_index)): The two indices we return are: (a) the index of the newly-added circle in the state.circle array, and (b) the normalised index, in the range [0, num_shapes), where polygons are first, then circles.
+        tuple[SimState, tuple[int, int]]: (new_sim_state, (circle_index, global_index)): The two indices we return are: (a) the index of the newly-added circle in the state.circle array, and (b) the global index, in the range [0, num_shapes), where polygons are first, then circles.
     """
     circle_index = jnp.argmin(sim_state.circle.active)
     can_add_circle = jnp.logical_not(sim_state.circle.active.all())
@@ -258,7 +258,7 @@ def add_rectangle_to_scene(
         fixated (bool, optional): If true, the shape has infinite mass, meaning that it will not move and acts as a fixed shape. Defaults to False.
 
     Returns:
-        tuple[SimState, tuple[int, int]]: (new_sim_state, (polygon_index, normalised_index)): The two indices we return are: (a) the index of the newly-added polygon in the state.polygon array, and (b) the normalised index, in the range [0, num_shapes), where polygons are first, then circles.
+        tuple[SimState, tuple[int, int]]: (new_sim_state, (polygon_index, global_index)): The two indices we return are: (a) the index of the newly-added polygon in the state.polygon array, and (b) the global index, in the range [0, num_shapes), where polygons are first, then circles.
     """
     half_dims = dimensions / 2.0
     vertices = jnp.array(
@@ -318,7 +318,7 @@ def add_polygon_to_scene(
         fixated (bool, optional): If true, the shape has infinite mass, meaning that it will not move and acts as a fixed shape. Defaults to False.
 
     Returns:
-        tuple[SimState, tuple[int, int]]: (new_sim_state, (polygon_index, normalised_index)): The two indices we return are: (a) the index of the newly-added polygon in the state.polygon array, and (b) the normalised index, in the range [0, num_shapes), where polygons are first, then circles.
+        tuple[SimState, tuple[int, int]]: (new_sim_state, (polygon_index, global_index)): The two indices we return are: (a) the index of the newly-added polygon in the state.polygon array, and (b) the global index, in the range [0, num_shapes), where polygons are first, then circles.
     """
     # Fill vertices up to maxP
     vertices = jnp.zeros((static_sim_params.max_polygon_vertices, 2)).at[:n_vertices].set(vertices)
