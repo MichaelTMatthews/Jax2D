@@ -5,23 +5,60 @@ from flax import struct
 
 @struct.dataclass
 class RigidBody:
-    position: jnp.ndarray  # Centroid
-    rotation: float  # Radians
-    velocity: jnp.ndarray  # m/s
-    angular_velocity: float  # rad/s
+    """This class represents a rigid body in the simulation. It can be a polygon or a circle.
 
-    inverse_mass: float  # We use 0 to denote a fixated object with infinite mass (constant velocity)
-    inverse_inertia: float  # Similarly, 0 denotes an object with infinite inertia (constant angular velocity)
+    Parameters:
+        position (jnp.ndarray): Position of the centroid of the shape in world space.
+
+        rotation (float): Rotation of the RigidBody in radians
+
+        velocity (jnp.ndarray): Velocity (x, y) in m/s
+
+        angular_velocity (float): Angular velocity in radians/s
+
+        inverse_mass (float): Inverse Mass, where 0 denotes an object with infinite mass (constant velocity)
+
+        inverse_inertia (float): Inverse Inertia, where 0 denotes an object with infinite inertia (constant angular velocity)
+
+        friction (float): Friction of the object
+
+        restitution (float):How 'bouncy' the shape is, 0.0 is not bouncy at all and 1.0 is very bouncy. Restitution is calculated by multiplying the restitution values of two colliding shapes, so both have to have values > 0 to bounce. Due to baumgarte, the actual restitution is a bit higher, so setting this to 1 will cause energy to be created on collision
+
+        collision_mode (int): 0 == doesn't collide with 1's. 1 = normal, i.e., it collides. 2 == collides with everything (including 0's).
+
+        active (bool): Whether or not the shape is active
+
+        # Polygon
+        n_vertices (int): Must be >= 3, denoting how many vertices the polygon has
+        vertices (jnp.ndarray): The vertices of the polygon in local space. The order must be clockwise, and the first vertex must be the top-left one.
+
+        # Circle
+        radius (float): If the shape is a circle, this is the radius
+
+    """
+
+    position: jnp.ndarray
+
+    rotation: float
+
+    velocity: jnp.ndarray
+
+    angular_velocity: float
+
+    inverse_mass: float
+
+    inverse_inertia: float
 
     friction: float
-    restitution: float  # Due to baumgarte, the actual restitution is a bit higher, so setting this to 1 will cause energy to be created on collision
 
-    collision_mode: int  # 0 == doesn't collide with 1's. 1 = normal, i.e., it collides. 2 == collides with everything (including 0's).
+    restitution: float
+
+    collision_mode: int
     active: bool
 
     # Polygon
-    n_vertices: int  # >=3 or things blow up
-    vertices: jnp.ndarray  # Clockwise or things blow up
+    n_vertices: int
+    vertices: jnp.ndarray
 
     # Circle
     radius: float
@@ -44,6 +81,32 @@ class CollisionManifold:
 
 @struct.dataclass
 class Joint:
+    """
+    Represents a joint that connects two entities.
+
+    Parameters:
+        a_index (int): Global index of the first entity connected by the joint.
+        b_index (int): Global index of the second entity connected by the joint.
+        a_relative_pos (jnp.ndarray): Relative position of the joint on the first entity.
+        b_relative_pos (jnp.ndarray): Relative position of the joint on the second entity.
+        global_position (jnp.ndarray): Cached global position of the joint in world space.
+        active (bool): Indicates whether the joint is currently active.
+
+        acc_impulse (jnp.ndarray): Accumulated linear impulse for the joint.
+        acc_r_impulse (jnp.ndarray): Accumulated rotational impulse for the joint.
+
+        motor_speed (float): Speed of the motor attached to the joint, if any.
+        motor_power (float): Maximum power output of the motor.
+        motor_on (bool): Indicates whether the motor is currently active.
+
+        motor_has_joint_limits (bool): Whether the motor has rotation limits for a revolute joint.
+        min_rotation (float): Minimum rotation angle allowed for the joint in radians.
+        max_rotation (float): Maximum rotation angle allowed for the joint in radians.
+
+        is_fixed_joint (bool): Indicates if the joint is fixed, preventing movement.
+        rotation (float): Fixed rotation angle if the joint is configured as a fixed joint.
+    """
+
     a_index: int
     b_index: int
     a_relative_pos: jnp.ndarray
@@ -72,6 +135,18 @@ class Joint:
 
 @struct.dataclass
 class Thruster:
+    """
+    Represents a thruster attached to an object, which can apply a force to the shape.
+
+    Parameters:
+        object_index (int): Global index of the object to which the thruster is attached.
+        relative_position (jnp.ndarray): Relative position of the thruster on the object.
+        rotation (float): Rotation angle of the thruster in radians.
+        power (float): Thrust power output of the thruster.
+        global_position (jnp.ndarray): Cached global position of the thruster in world space.
+        active (jnp.ndarray): Indicates whether the thruster is currently active.
+    """
+
     object_index: int
     relative_position: jnp.ndarray
     rotation: float

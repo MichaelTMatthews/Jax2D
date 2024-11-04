@@ -11,10 +11,25 @@ from jax2d.engine import (
     calc_inverse_inertia_polygon,
     calculate_collision_matrix,
 )
-from jax2d.sim_state import SimState
+from jax2d.sim_state import SimState, StaticSimParams
 
 
-def add_thruster_to_scene(sim_state: SimState, object_index, relative_position, rotation, power=1.0):
+def add_thruster_to_scene(
+    sim_state: SimState, object_index: int, relative_position: jnp.ndarray, rotation: float, power=1.0
+) -> tuple[SimState, int]:
+    """
+    Adds a thruster to the object specified by `object_index`.
+
+    Args:
+        sim_state (SimState):
+        object_index (int): The normalised object index, i.e., in the range [0, num_objects), where polygons are first, then circles.
+        relative_position (jnp.ndarray): Position of the thruster relative to the center of mass of the object.
+        rotation (float): The rotation of the thruster, note that it is recommended to have the thruster always point in the direction of the center of mass of the object.
+        power (float, optional): How strong the thruster is. Defaults to 1.0.
+
+    Returns:
+        tuple[SimState, int]: (new_sim_state, thruster_index)
+    """
     thruster_index = jnp.argmin(sim_state.thruster.active)
     can_add_thruster = jnp.logical_not(sim_state.thruster.active.all())
 
@@ -41,18 +56,37 @@ def add_thruster_to_scene(sim_state: SimState, object_index, relative_position, 
 @partial(jax.jit, static_argnames="static_sim_params")
 def add_revolute_joint_to_scene(
     sim_state: SimState,
-    static_sim_params,
-    a_index,
-    b_index,
-    a_relative_pos,
-    b_relative_pos,
-    motor_on=False,
-    motor_speed=1.0,
-    motor_power=1.0,
-    has_joint_limits=False,
-    min_rotation=-np.pi,
-    max_rotation=np.pi,
-):
+    static_sim_params: StaticSimParams,
+    a_index: int,
+    b_index: int,
+    a_relative_pos: jnp.ndarray,
+    b_relative_pos: jnp.ndarray,
+    motor_on: bool = False,
+    motor_speed: float = 1.0,
+    motor_power: float = 1.0,
+    has_joint_limits: bool = False,
+    min_rotation: float = -np.pi,
+    max_rotation: float = np.pi,
+) -> tuple[SimState, int]:
+    """Adds a revolute joint to the scene, connecting the two shapes given by `a_index` and `b_index`.
+
+    Args:
+        sim_state (SimState):
+        static_sim_params (StaticSimParams):
+        a_index (int): Normalised object index in range [0, num_shapes)
+        b_index (int): Normalised object index in range [0, num_shapes)
+        a_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `a_index`.
+        b_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `b_index`.
+        motor_on (bool, optional): If this is true, the joint has a motor that can be activated by actions, applying a torque to these two objects. Defaults to False.
+        motor_speed (float, optional): Only in use if `motor_on` is `True`, how fast can the motor rotate. Defaults to 1.0.
+        motor_power (float, optional): Only in use if `motor_on` is `True`, the maximum torque the motor can apply. Defaults to 1.0.
+        has_joint_limits (bool, optional): If true, then the joint has limits that it cannot exceed. Defaults to False.
+        min_rotation (float, optional): Minimum joint limit. Defaults to -np.pi.
+        max_rotation (float, optional): Maximum joint limit. Defaults to np.pi.
+
+    Returns:
+        tuple[SimState, int]: (new_sim_state, joint_index)
+    """
     joint_index = jnp.argmin(sim_state.joint.active)
     can_add_joint = jnp.logical_not(sim_state.joint.active.all())
 
@@ -86,12 +120,25 @@ def add_revolute_joint_to_scene(
 @partial(jax.jit, static_argnames="static_sim_params")
 def add_fixed_joint_to_scene(
     sim_state: SimState,
-    static_sim_params,
-    a_index,
-    b_index,
-    a_relative_pos,
-    b_relative_pos,
-):
+    static_sim_params: StaticSimParams,
+    a_index: int,
+    b_index: int,
+    a_relative_pos: jnp.ndarray,
+    b_relative_pos: jnp.ndarray,
+) -> tuple[SimState, int]:
+    """Adds a fixed joint to a scene, where a fixed joint does not allow the relative rotation between the two objects to change.
+
+    Args:
+        sim_state (SimState):
+        static_sim_params (StaticSimParams):
+        a_index (int): Normalised object index in range [0, num_shapes)
+        b_index (int): Normalised object index in range [0, num_shapes)
+        a_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `a_index`.
+        b_relative_pos (jnp.ndarray): The joint's position relative to the center of mass of object `b_index`.
+
+    Returns:
+        tuple[SimState, int]: (new_sim_state, joint_index)
+    """
     joint_index = jnp.argmin(sim_state.joint.active)
     can_add_joint = jnp.logical_not(sim_state.joint.active.all())
 
@@ -119,17 +166,35 @@ def add_fixed_joint_to_scene(
 @partial(jax.jit, static_argnames="static_sim_params")
 def add_circle_to_scene(
     sim_state: SimState,
-    static_sim_params,
-    position,
-    radius,
-    rotation=0.0,
-    velocity=jnp.zeros(2),
-    angular_velocity=0.0,
-    density=1.0,
-    friction=1.0,
-    restitution=0.0,
-    fixated=False,
-):
+    static_sim_params: StaticSimParams,
+    position: jnp.ndarray,
+    radius: float,
+    rotation: float = 0.0,
+    velocity: jnp.ndarray = jnp.zeros(2),
+    angular_velocity: float = 0.0,
+    density: float = 1.0,
+    friction: float = 1.0,
+    restitution: float = 0.0,
+    fixated: bool = False,
+) -> tuple[SimState, tuple[int, int]]:
+    """Adds a circle to the scene, with the properties specified by the given parameters.
+
+    Args:
+        sim_state (SimState):
+        static_sim_params (StaticSimParams):
+        position (jnp.ndarray): Position of the center in world space
+        radius (float): Radius of the circle
+        rotation (float, optional): Rotation. Defaults to 0.0.
+        velocity (jnp.ndarray, optional): Initial velocity. Defaults to jnp.zeros(2).
+        angular_velocity (float, optional): Initial angular velocity. Defaults to 0.0.
+        density (float, optional): Shape's density. Defaults to 1.0.
+        friction (float, optional): Friction coefficient. Defaults to 1.0.
+        restitution (float, optional): How 'bouncy' the shape is, 0.0 is not bouncy at all and 1.0 is very bouncy. Restitution is calculated by multiplying the restitution values of two colliding shapes, so both have to have values > 0 to bounce. Defaults to 0.0.
+        fixated (bool, optional): If true, the shape has infinite mass, meaning that it will not move and acts as a fixed shape. Defaults to False.
+
+    Returns:
+        tuple[SimState, tuple[int, int]]: (new_sim_state, (circle_index, normalised_index)): The two indices we return are: (a) the index of the newly-added circle in the state.circle array, and (b) the normalised index, in the range [0, num_shapes), where polygons are first, then circles.
+    """
     circle_index = jnp.argmin(sim_state.circle.active)
     can_add_circle = jnp.logical_not(sim_state.circle.active.all())
 
@@ -166,17 +231,35 @@ def add_circle_to_scene(
 @partial(jax.jit, static_argnames="static_sim_params")
 def add_rectangle_to_scene(
     sim_state: SimState,
-    static_sim_params,
-    position,
-    dimensions,
-    rotation=0.0,
-    velocity=jnp.zeros(2),
-    angular_velocity=0.0,
-    density=1.0,
-    friction=1.0,
-    restitution=0.0,
-    fixated=False,
-):
+    static_sim_params: StaticSimParams,
+    position: jnp.ndarray,
+    dimensions: jnp.ndarray,
+    rotation: float = 0.0,
+    velocity: jnp.ndarray = jnp.zeros(2),
+    angular_velocity: float = 0.0,
+    density: float = 1.0,
+    friction: float = 1.0,
+    restitution: float = 0.0,
+    fixated: bool = False,
+) -> tuple[SimState, tuple[int, int]]:
+    """Adds a rectangle to the scene.
+
+    Args:
+        sim_state (SimState):
+        static_sim_params (StaticSimParams):
+        position (jnp.ndarray): Position of the center of the rectangle in world space
+        dimensions (jnp.ndarray): (width, height) of the rectangle
+        rotation (float, optional): Rotation. Defaults to 0.0.
+        velocity (jnp.ndarray, optional): Initial velocity. Defaults to jnp.zeros(2).
+        angular_velocity (float, optional): Initial angular velocity. Defaults to 0.0.
+        density (float, optional): Shape's density. Defaults to 1.0.
+        friction (float, optional): Friction coefficient. Defaults to 1.0.
+        restitution (float, optional): How 'bouncy' the shape is, 0.0 is not bouncy at all and 1.0 is very bouncy. Restitution is calculated by multiplying the restitution values of two colliding shapes, so both have to have values > 0 to bounce. Defaults to 0.0.
+        fixated (bool, optional): If true, the shape has infinite mass, meaning that it will not move and acts as a fixed shape. Defaults to False.
+
+    Returns:
+        tuple[SimState, tuple[int, int]]: (new_sim_state, (polygon_index, normalised_index)): The two indices we return are: (a) the index of the newly-added polygon in the state.polygon array, and (b) the normalised index, in the range [0, num_shapes), where polygons are first, then circles.
+    """
     half_dims = dimensions / 2.0
     vertices = jnp.array(
         [
@@ -206,18 +289,37 @@ def add_rectangle_to_scene(
 @partial(jax.jit, static_argnames=["static_sim_params", "n_vertices"])
 def add_polygon_to_scene(
     sim_state: SimState,
-    static_sim_params,
-    position,
-    vertices,
-    n_vertices,
-    rotation=0.0,
-    velocity=jnp.zeros(2),
-    angular_velocity=0.0,
-    density=1.0,
-    friction=1.0,
-    restitution=0.0,
-    fixated=False,
-):
+    static_sim_params: StaticSimParams,
+    position: jnp.ndarray,
+    vertices: jnp.ndarray,
+    n_vertices: int,
+    rotation: float = 0.0,
+    velocity: jnp.ndarray = jnp.zeros(2),
+    angular_velocity: float = 0.0,
+    density: float = 1.0,
+    friction: float = 1.0,
+    restitution: float = 0.0,
+    fixated: bool = False,
+) -> tuple[SimState, tuple[int, int]]:
+    """Adds a polygon to the scene.
+
+    Args:
+        sim_state (SimState):
+        static_sim_params (StaticSimParams):
+        position (jnp.ndarray): Position of the center of the polygon in world space.
+        vertices (jnp.ndarray): A list of vertices, which has shape (n_vertices, 2). The ordering of these vertices is important, and has to be clockwise, starting from the top-left vertex.
+        n_vertices (int): How many vertices are in the polygon.
+        rotation (float, optional): Rotation. Defaults to 0.0.
+        velocity (jnp.ndarray, optional): Initial velocity. Defaults to jnp.zeros(2).
+        angular_velocity (float, optional): Initial angular velocity. Defaults to 0.0.
+        density (float, optional): Shape's density. Defaults to 1.0.
+        friction (float, optional): Friction coefficient. Defaults to 1.0.
+        restitution (float, optional): How 'bouncy' the shape is, 0.0 is not bouncy at all and 1.0 is very bouncy. Restitution is calculated by multiplying the restitution values of two colliding shapes, so both have to have values > 0 to bounce. Defaults to 0.0.
+        fixated (bool, optional): If true, the shape has infinite mass, meaning that it will not move and acts as a fixed shape. Defaults to False.
+
+    Returns:
+        tuple[SimState, tuple[int, int]]: (new_sim_state, (polygon_index, normalised_index)): The two indices we return are: (a) the index of the newly-added polygon in the state.polygon array, and (b) the normalised index, in the range [0, num_shapes), where polygons are first, then circles.
+    """
     # Fill vertices up to maxP
     vertices = jnp.zeros((static_sim_params.max_polygon_vertices, 2)).at[:n_vertices].set(vertices)
 

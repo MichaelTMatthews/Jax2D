@@ -1,0 +1,51 @@
+site_name: Jax2D
+site_url: https://github.com/MichaelTMatthews/Jax2D
+nav:
+  - Home: index.md
+  - Example Usage: example.md
+  - More Details:
+    - Scene: scene.md
+    - Entities: entities.md
+markdown_extensions:
+  - toc:
+      toc_depth: 2
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+theme: 
+  name: readthedocs
+  palette:
+    - media: "(prefers-color-scheme: dark)" 
+      scheme: slate
+      primary: teal
+      accent: light green
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)" 
+      scheme: default
+      primary: green
+      accent: deep orange
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [../jax2d]
+          options:
+            show_docstring_examples: true
+            show_root_heading: false
+            show_source: False
+            separate_signature: true
+            line_length: 60
+            extensions:
+              - griffe_fieldz
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
