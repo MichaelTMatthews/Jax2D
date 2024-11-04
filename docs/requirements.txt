@@ -1,0 +1,6 @@
+jax
+flax
+mkdocs
+mkdocstrings-python
+mkdocs-material
+griffe_fieldz
