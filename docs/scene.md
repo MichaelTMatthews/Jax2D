@@ -14,7 +14,10 @@ sim_state = create_empty_sim(static_sim_params, floor_offset=0.0)
 ```
 
 # Editing a Scene
-While you can edit a scene manually by changing the parameters
+While you can edit a scene manually by changing the parameters, we recommend using the functions provided in `jax2d.scene` to edit a state.
+
+!!! danger "Environment Size"
+    Note, if the environment state has the maximum number of a certain entity type (e.g. polygons) and you try to add another one, it will result in a no-op.
 
 
 ::: jax2d.scene

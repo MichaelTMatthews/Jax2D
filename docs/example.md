@@ -1,4 +1,9 @@
-Below shows an example of how to use Jax2D to create and run a scene.  For the full code see [examples/car.py](examples/car.py)
+Below shows an example of how to use Jax2D to create and run a scene.  For the full code see [examples/car.py](examples/car.py). This produces the following scene (rendered with [JaxGL](https://github.com/FLAIROx/JaxGL))
+
+<p align="center">
+ <img width="50%" src="../car.gif" />
+</p>
+
 ```python
 # Create engine with default parameters
 static_sim_params = StaticSimParams()
@@ -65,8 +70,3 @@ while True:
     
     # Do rendering...
 ```
-This produces the following scene (rendered with [JaxGL](https://github.com/FLAIROx/JaxGL))
-
-<p align="center">
- <img width="50%" src="../car.gif" />
-</p>
