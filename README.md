@@ -100,7 +100,7 @@ This produces the following scene (rendered with [JaxGL](https://github.com/FLAI
 </p>
 
 # More Complex Levels
-For creating and using more complicated levels, we recommend using the built-in editors provided in [Kinetix](https://github.com/FLAIROx/Kinetix).
+For creating and using more complicated levels, we recommend using the built-in editors provided in [Kinetix](https://github.com/FLAIROx/Kinetix) (or the online version available [here](https://kinetix-env.github.io/gallery.html?editor=true)).
 
 # Installation
 To use Jax2D in your work you can install via PyPi:
@@ -119,7 +119,7 @@ pre-commit install
 # See Also
 - 🍎 [Box2D](https://github.com/erincatto/box2d) The original C physics engine
 - 🤖 [Kinetix](https://github.com/FLAIROx/Kinetix) Jax2D as a reinforcement learning environment
-- 🌐 [KinetixJS](https://github.com/Michael-Beukman/KinetixJS) Jax2D reimplemented in Javascript
+- 🌐 [Kinetix.js](https://github.com/Michael-Beukman/Kinetix.js) Jax2D reimplemented in Javascript, with a live demo [here](https://kinetix-env.github.io/gallery.html?editor=true).
 - 🦾 [Brax](https://github.com/google/brax) 3D physics in JAX
 - 🦿 [MJX](https://github.com/google-deepmind/mujoco/tree/main/mjx) MuJoCo in JAX
 - 👨‍💻 [JaxGL](https://github.com/FLAIROx/JaxGL) Rendering in JAX
