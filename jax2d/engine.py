@@ -1021,8 +1021,8 @@ def create_empty_sim(
             jnp.array(
                 [
                     [-scene_size, scene_size],
-                    [-0.05, scene_size],
-                    [-0.05, 0],
+                    [0.0, scene_size],
+                    [0.0, 0],
                     [-scene_size, 0],
                 ]
             )
