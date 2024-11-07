@@ -8,6 +8,9 @@
         <img src="https://img.shields.io/badge/License-MIT-yellow" /></a>
        <a href= "https://github.com/psf/black">
         <img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
+        <a href="https://jax2d.readthedocs.io/en/latest/">
+        <img src="https://readthedocs.org/projects/jax2d/badge/?version=latest">
+        </a>
 </p>
 
 Jax2D is a 2D rigid-body physics engine written entirely in [JAX](https://github.com/google/jax) and based off the [Box2D](https://github.com/erincatto/box2d) engine.
@@ -26,7 +29,7 @@ This means it is usually not appropriate for simulating scenes with large number
 In short: Jax2D excels at simulating **lots** of **small** and **diverse** scenes in parallel **very fast**.
 
 # Example Usage
-Below shows an example of how to use Jax2D to create and run a scene.  For the full code see [examples/car.py](examples/car.py)
+Below shows an example of how to use Jax2D to create and run a scene.  For the full code see [examples/car.py](examples/car.py). Also see our [docs](https://jax2d.readthedocs.io/en/latest/) for more details on how Jax2D works.
 ```python
 # Create engine with default parameters
 static_sim_params = StaticSimParams()
