@@ -362,13 +362,13 @@ def generate_manifolds_polygon_polygon(a: RigidBody, b: RigidBody, ws_manifolds:
         [
             jnp.clip(
                 incident_face_ref_space[0],
-                a_min=jnp.array([-99999, 0]),
-                a_max=jnp.array([999999, r1_r2_len]),
+                min=jnp.array([-99999, 0]),
+                max=jnp.array([999999, r1_r2_len]),
             ),
             jnp.clip(
                 incident_face_ref_space[1],
-                a_min=jnp.array([-99999, 0]),
-                a_max=jnp.array([999999, r1_r2_len]),
+                min=jnp.array([-99999, 0]),
+                max=jnp.array([999999, r1_r2_len]),
             ),
         ]
     )

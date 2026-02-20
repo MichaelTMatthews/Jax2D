@@ -58,35 +58,35 @@ def clip_state(state: SimState, params: SimParams):
         circle=state.circle.replace(
             position=jnp.clip(
                 state.circle.position,
-                a_min=-params.clip_position,
-                a_max=params.clip_position,
+                min=-params.clip_position,
+                max=params.clip_position,
             ),
             velocity=jnp.clip(
                 state.circle.velocity,
-                a_min=-params.clip_velocity,
-                a_max=params.clip_velocity,
+                min=-params.clip_velocity,
+                max=params.clip_velocity,
             ),
             angular_velocity=jnp.clip(
                 state.circle.angular_velocity,
-                a_min=-params.clip_angular_velocity,
-                a_max=params.clip_angular_velocity,
+                min=-params.clip_angular_velocity,
+                max=params.clip_angular_velocity,
             ),
         ),
         polygon=state.polygon.replace(
             position=jnp.clip(
                 state.polygon.position,
-                a_min=-params.clip_position,
-                a_max=params.clip_position,
+                min=-params.clip_position,
+                max=params.clip_position,
             ),
             velocity=jnp.clip(
                 state.polygon.velocity,
-                a_min=-params.clip_velocity,
-                a_max=params.clip_velocity,
+                min=-params.clip_velocity,
+                max=params.clip_velocity,
             ),
             angular_velocity=jnp.clip(
                 state.polygon.angular_velocity,
-                a_min=-params.clip_angular_velocity,
-                a_max=params.clip_angular_velocity,
+                min=-params.clip_angular_velocity,
+                max=params.clip_angular_velocity,
             ),
         ),
     )
